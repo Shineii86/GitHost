@@ -2,7 +2,7 @@
 
 [![GitHost Banner](https://raw.githubusercontent.com/Shineii86/GitHost/main/images/GitHost.png)](https://github.com/Shineii86/GitHost)
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Shineii86/GitHost/blob/main/notebooks/GitHost_Pro.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Shineii86/GitHost/blob/main/notebooks/GitHost.ipynb)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
