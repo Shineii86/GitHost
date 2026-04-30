@@ -11,6 +11,8 @@ from typing import Optional
 import requests
 from PIL import Image
 
+from .security import sanitize_filename, validate_password, validate_url
+
 logger = logging.getLogger(__name__)
 
 ALLOWED_EXTENSIONS = {
@@ -83,6 +85,7 @@ def generate_thumbnail(file_path: str, thumb_dir: str, file_id: str, max_size: t
 def process_upload_from_file(data: bytes, filename: str, media_dir: str,
                               thumb_dir: str) -> Optional[UploadResult]:
     """Process an uploaded file: validate, save, generate thumbnail."""
+    filename = sanitize_filename(filename)
     ext = Path(filename).suffix.lower()
     if ext not in ALLOWED_EXTENSIONS:
         logger.warning("Skipping %s — unsupported format (%s)", filename, ext)
@@ -115,6 +118,12 @@ def process_upload_from_file(data: bytes, filename: str, media_dir: str,
 def process_upload_from_url(url: str, media_dir: str, thumb_dir: str,
                              timeout: int = 30) -> Optional[UploadResult]:
     """Download a file from URL and process it."""
+    # Validate URL
+    is_valid, error_msg = validate_url(url)
+    if not is_valid:
+        logger.warning("Invalid URL: %s", error_msg)
+        return None
+
     try:
         resp = requests.get(url, timeout=timeout, stream=True, allow_redirects=True)
         resp.raise_for_status()

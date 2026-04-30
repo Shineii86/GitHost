@@ -20,6 +20,11 @@ from .templates import (
     render_password_gate, render_error,
 )
 from .cleanup import cleanup_expired, get_storage_stats
+from .security import (
+    generate_csrf_token, csrf_protect, rate_limit,
+    add_security_headers, sanitize_filename,
+    validate_expiry_days, validate_max_views, validate_password,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -31,6 +36,14 @@ def create_app(storage, config, notifier_email=None, notifier_telegram=None, sho
     CORS(app)
 
     ADMIN_PASSWORD = config.server.admin_password
+
+    # Register security headers on all responses
+    app.after_request(add_security_headers)
+
+    # Make CSRF token available in all templates
+    @app.context_processor
+    def inject_csrf():
+        return dict(csrf_token=generate_csrf_token)
 
     # --- Security helpers ---
 
@@ -51,6 +64,7 @@ def create_app(storage, config, notifier_email=None, notifier_telegram=None, sho
         return render_home(f"/", stats)
 
     @app.route("/i/<link_id>", methods=["GET"])
+    @rate_limit(max_requests=60, window_seconds=60)
     def serve_media(link_id):
         if link_id not in storage.links_db:
             return render_error(404, "Link not found or never existed."), 404
@@ -107,24 +121,33 @@ def create_app(storage, config, notifier_email=None, notifier_telegram=None, sho
         return render_gallery(active, "/")
 
     @app.route("/admin", methods=["GET", "POST"])
+    @rate_limit(max_requests=10, window_seconds=60)
     def admin():
         error = ""
 
         if request.method == "POST":
             action = request.form.get("action", "")
 
-            # Login
+            # Login (no CSRF needed for login)
             if "password" in request.form and "link_id" not in request.form:
                 if request.form["password"] == ADMIN_PASSWORD:
                     session["admin_authenticated"] = True
+                    # Regenerate CSRF token on login
+                    session.pop("csrf_token", None)
                     return redirect("/admin")
                 else:
                     error = "Incorrect password."
                     return render_admin(storage.links_db, authenticated=False, error=error)
 
-            # Authenticated actions
+            # Authenticated actions — require CSRF
             if not session.get("admin_authenticated"):
                 return redirect("/admin")
+
+            csrf_token = request.form.get("csrf_token", "")
+            from .security import validate_csrf_token
+            if not validate_csrf_token(csrf_token):
+                error = "Invalid security token. Please refresh."
+                return render_admin(storage.links_db, authenticated=True, error=error)
 
             if action == "delete":
                 link_id = request.form.get("link_id")
@@ -141,7 +164,7 @@ def create_app(storage, config, notifier_email=None, notifier_telegram=None, sho
             return redirect("/admin")
 
         if session.get("admin_authenticated"):
-            return render_admin(storage.links_db, authenticated=True)
+            return render_admin(storage.links_db, authenticated=True, csrf_token=generate_csrf_token())
 
         return render_admin(storage.links_db, authenticated=False, error=error)
 

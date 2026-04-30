@@ -410,7 +410,7 @@ def render_gallery(active_links: list, base_url: str) -> str:
 </html>"""
 
 
-def render_admin(links_db: dict, authenticated: bool = False, error: str = "") -> str:
+def render_admin(links_db: dict, authenticated: bool = False, error: str = "", csrf_token: str = "") -> str:
     if not authenticated:
         error_html = f'<p style="color:var(--danger); margin-bottom:12px;">{error}</p>' if error else ""
         return f"""<!DOCTYPE html>
@@ -483,6 +483,7 @@ def render_admin(links_db: dict, authenticated: bool = False, error: str = "") -
             <td>{created}</td>
             <td>
                 <form method="post" style="display:inline;">
+                    <input type="hidden" name="csrf_token" value="{csrf_token}">
                     <input type="hidden" name="link_id" value="{link_id}">
                     <input type="hidden" name="action" value="delete">
                     <button type="submit" class="btn btn-danger" onclick="return confirm('Delete this link?')">Delete</button>
@@ -531,6 +532,7 @@ def render_admin(links_db: dict, authenticated: bool = False, error: str = "") -
             </table>
         </div>
         <form method="post" style="margin-top:16px;">
+            <input type="hidden" name="csrf_token" value="{csrf_token}">
             <input type="hidden" name="action" value="cleanup">
             <button type="submit" class="btn btn-success">🧹 Cleanup Expired</button>
         </form>
