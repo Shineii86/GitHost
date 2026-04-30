@@ -9,13 +9,13 @@
 [![GitHub Stars](https://img.shields.io/github/stars/Shineii86/GitHost?style=for-the-badge)](https://github.com/Shineii86/GitHost/stargazers)
 [![GitHub Forks](https://img.shields.io/github/forks/Shineii86/GitHost?style=for-the-badge)](https://github.com/Shineii86/GitHost/fork)
 
-**The ultimate self-hosted media sharing platform. Upload anything, get expiring links, password protection, gallery view, admin panel, and 15+ more features — all from your phone.**
+**The ultimate self-hosted media sharing platform. Upload anything, get expiring links, password protection, gallery view, admin panel, and 10+ more features — all from your phone.**
 
 </div>
 
 ---
 
-> 🚀 **v2.0 — NOW MODULAR & IMPROVED**
+> 🚀 **ALL FEATURES INCLUDED**
 > 
 > GitHost is a complete, self-hosted alternative to services like Imgur, Dropbox shared links, or WeTransfer. It stores your files securely in your own **private GitHub repository** while providing a temporary, feature-rich public interface through a Colab-powered web server.
 
@@ -23,23 +23,29 @@
 
 ## 📖 Table of Contents
 
-- [What is GitHost?](#-what-is-githost)
-- [Why Use GitHost?](#-why-use-githost)
-- [✨ What's New in v2.0](#-whats-new-in-v20)
+- [What is GitHost?](#-what-is-githost-pro)
+- [Why Use GitHost?](#-why-use-githost-pro)
 - [Complete Feature List](#-complete-feature-list)
-- [Project Structure](#-project-structure)
 - [Prerequisites](#-prerequisites)
 - [Step-by-Step Setup Guide](#-step-by-step-setup-guide)
-- [How to Use GitHost](#-how-to-use-githost)
+  - [1. Get Your GitHub Token](#1-get-your-github-token)
+  - [2. Get Your ngrok Token](#2-get-your-ngrok-token)
+  - [3. Optional: Email Notifications](#3-optional-email-notifications)
+  - [4. Optional: Telegram Bot](#4-optional-telegram-bot)
+  - [5. Optional: Bit.ly URL Shortening](#5-optional-bitly-url-shortening)
+- [How to Use GitHost](#-how-to-use-githost-pro)
+  - [Uploading Files](#uploading-files)
+  - [Sharing Links](#sharing-links)
+  - [Managing Links](#managing-links)
+  - [Viewing the Gallery](#viewing-the-gallery)
 - [Configuration Reference](#-configuration-reference)
 - [Endpoints & URLs](#-endpoints--urls)
-- [API Reference](#-api-reference)
-- [Architecture](#-architecture)
-- [Security](#-security)
+- [Architecture & How It Works](#-architecture--how-it-works)
+- [Security Considerations](#-security-considerations)
 - [Troubleshooting](#-troubleshooting)
 - [FAQ](#-faq)
-- [License](#-license)
-- [Credits](#-credits)
+- [License & Disclaimer](#-license--disclaimer)
+- [Credits & Acknowledgments](#-credits--acknowledgments)
 
 ---
 
@@ -57,97 +63,46 @@ With GitHost, you get:
 - **Temporary access** — Links expire after a set number of days
 - **View limits** — Links can self-destruct after N views
 - **Password protection** — Optional password required to access
-- **Beautiful interface** — Dark-themed gallery, QR codes, and admin panel
+- **Beautiful interface** — Gallery view, QR codes, and admin panel
 - **Mobile-first** — Upload directly from your phone via Google Colab
 
 ---
 
 ## ✅ Why Use GitHost?
 
-| Feature | GitHost | Imgur | WeTransfer | Dropbox |
-|---------|---------|-------|------------|---------|
+| Feature | GitHost | Imgur | WeTransfer | Dropbox Shared Links |
+|---------|-------------|-------|------------|---------------------|
 | Self-hosted storage | ✅ Your GitHub | ❌ | ❌ | ❌ |
-| Expiring links | ✅ Configurable | ❌ | ✅ | ✅ (Pro) |
+| Expiring links | ✅ Configurable | ❌ | ✅ | ✅ (Pro only) |
 | View limits | ✅ Yes | ❌ | ❌ | ❌ |
 | Password protection | ✅ Yes | ❌ | ✅ | ✅ |
 | Gallery view | ✅ Yes | ❌ | ❌ | ❌ |
 | QR codes | ✅ Yes | ❌ | ❌ | ❌ |
 | Admin panel | ✅ Yes | ❌ | ❌ | ❌ |
-| JSON API | ✅ Yes | ❌ | ❌ | ❌ |
-| Free | ✅ Yes | ✅ | ✅ (5GB) | ✅ (limited) |
-
----
-
-## 🆕 What's New in v2.0
-
-| Improvement | Description |
-|-------------|-------------|
-| 🏗️ **Modular Architecture** | Refactored from monolithic notebook into clean Python package |
-| 🎨 **Dark-Themed UI** | Beautiful responsive interface with proper design system |
-| 🔐 **Session-Based Admin** | No more password on every request — login once |
-| 🛡️ **CSRF Protection** | Tokens on all admin forms |
-| ⏱️ **Rate Limiting** | 60 req/min on media, 10 req/min on admin |
-| 🔒 **Security Headers** | CSP, X-Frame-Options, X-Content-Type-Options |
-| 🚫 **SSRF Prevention** | URL validation blocks private/internal IPs |
-| 📊 **Stats Dashboard** | Home page shows active links, views, storage |
-| 🔍 **Search API** | Search links by filename |
-| 📄 **Link Detail Pages** | `/info/<id>` with full stats |
-| 🌐 **JSON API** | `/api/stats`, `/api/search`, `/api/popular`, `/api/expiring` |
-| 📁 **More File Types** | Audio, webp, svg, docx, xlsx, pptx support |
-| 🧹 **Manual Cleanup** | Button in admin to purge expired links |
-| 📦 **Better ZIP Export** | Original filenames preserved in downloads |
-| 🖼️ **Better Thumbnails** | RGBA→RGB conversion, JPEG quality tuning |
+| Free | ✅ Yes | ✅ | ✅ (5GB limit) | ✅ (limited) |
+| No file size limit | ✅ GitHub's limit | 20MB | 2GB | Varies |
 
 ---
 
 ## ✨ Complete Feature List
 
-| # | Feature | Description |
-|---|---------|-------------|
-| 1 | One-Time View Links | Self-destruct after 1 view |
-| 2 | Password Protection | Optional password per batch |
-| 3 | Multi-Format Support | Images, videos, PDFs, ZIPs, audio, docs |
-| 4 | Custom Expiry Per Batch | Different expiry for each upload |
-| 5 | Admin Dashboard | `/admin` with session auth & delete |
-| 6 | QR Code Generation | For every shareable link |
-| 7 | Automatic Thumbnails | Image previews in gallery |
-| 8 | Upload from URL | Paste URL instead of file upload |
-| 9 | Email Notifications | On upload and link access |
-| 10 | Bit.ly URL Shortening | Clean, short URLs |
-| 11 | Public Gallery | `/gallery` with dark theme |
-| 12 | Auto-Cleanup | Expired files auto-deleted |
-| 13 | Custom ngrok Subdomain | Consistent URL (paid) |
-| 14 | Download All as ZIP | `/download_all` with original names |
-| 15 | Telegram Bot | Upload/access alerts |
-| 16 | JSON API | Stats, search, popular, expiring |
-| 17 | Link Detail Pages | `/info/<id>` with full stats |
-| 18 | Storage Dashboard | Stats on home page |
-
----
-
-## 📁 Project Structure
-
-```
-GitHost/
-├── notebooks/
-│   └── GitHost.ipynb          # Colab notebook (main entry point)
-├── githost/
-│   ├── __init__.py             # Package metadata
-│   ├── __main__.py             # CLI entry point
-│   ├── app.py                  # Flask application & routes
-│   ├── cleanup.py              # Expired link cleanup
-│   ├── config.py               # Configuration management
-│   ├── link_manager.py         # Search, stats, batch operations
-│   ├── notifications.py        # Email & Telegram notifiers
-│   ├── security.py             # CSRF, rate limiting, validation
-│   ├── shortener.py            # Bit.ly URL shortening
-│   ├── storage.py              # GitHub storage backend
-│   ├── templates.py            # HTML templates (dark theme)
-│   └── uploads.py              # File upload & processing
-├── requirements.txt            # Python dependencies
-├── LICENSE                     # MIT License
-└── README.md                   # This file
-```
+| # | Feature | Description | How to Use |
+|---|---------|-------------|------------|
+| 1 | **One-Time View Links** | Links that self-destruct after being viewed once. | Set `Max views = 1` during upload. |
+| 2 | **Password Protection** | Require a password to access the file. | Enter a password when prompted during upload. |
+| 3 | **Multi-Format Support** | Images, videos, PDFs, ZIPs, documents. | Upload any file with supported extension. |
+| 4 | **Custom Expiry Per Batch** | Set different expiry for each upload batch. | Enter custom expiry days during upload. |
+| 5 | **Admin Dashboard** | View all links, view counts, and manually revoke. | Visit `/admin` with password `admin123`. |
+| 6 | **QR Code Generation** | Scan to open link on another device. | Automatically displayed after upload. |
+| 7 | **Automatic Thumbnails** | Image previews in gallery. | Generated for JPG, PNG, GIF files. |
+| 8 | **Upload from URL** | Download from a URL instead of uploading. | Type `url` when prompted for upload method. |
+| 9 | **Email Notifications** | Alerts on upload and when links are accessed. | Configure email settings in the form. |
+| 10 | **Bit.ly Shortening** | Short, clean URLs for sharing. | Add your Bit.ly access token. |
+| 11 | **Public Gallery** | Grid view of all active media. | Visit `/gallery`. |
+| 12 | **Auto-Cleanup** | Expired files are automatically deleted. | Runs on every server start. |
+| 13 | **Custom ngrok Subdomain** | Consistent URL (paid ngrok required). | Set `NGROK_SUBDOMAIN` in config. |
+| 14 | **Download All as ZIP** | One-click download of all media. | Visit `/download_all`. |
+| 15 | **Telegram Bot Notifications** | Get upload alerts in Telegram. | Configure bot token and chat ID. |
 
 ---
 
@@ -157,17 +112,17 @@ GitHost/
 
 | Credential | Purpose | Where to Get It |
 |------------|---------|-----------------|
-| GitHub Account | Storage | [github.com](https://github.com) |
-| GitHub PAT (Classic) | API access | [Settings → Tokens](https://github.com/settings/tokens) |
-| ngrok Auth Token | Public URL | [ngrok Dashboard](https://dashboard.ngrok.com/signup) |
+| **GitHub Account** | Storage for your files | [github.com](https://github.com) |
+| **GitHub Personal Access Token (Classic)** | API access to create/update repo | [Settings → Developer settings → Tokens (classic)](https://github.com/settings/tokens) |
+| **ngrok Auth Token** | Public URL for the server | [ngrok Dashboard](https://dashboard.ngrok.com/signup) |
 
 ### Optional
 
 | Credential | Purpose | Where to Get It |
 |------------|---------|-----------------|
-| Gmail App Password | Email alerts | [Google App Passwords](https://myaccount.google.com/apppasswords) |
-| Telegram Bot Token | Telegram alerts | [@BotFather](https://t.me/botfather) |
-| Bit.ly Access Token | URL shortening | [Bit.ly API](https://app.bitly.com/settings/api/) |
+| **Gmail App Password** | Email notifications | [Google App Passwords](https://myaccount.google.com/apppasswords) |
+| **Telegram Bot Token** | Telegram notifications | [@BotFather](https://t.me/botfather) on Telegram |
+| **Bit.ly Access Token** | URL shortening | [Bit.ly API Settings](https://app.bitly.com/settings/api/) |
 
 ---
 
@@ -175,47 +130,70 @@ GitHost/
 
 ### 1. Get Your GitHub Token
 
-1. Go to **Settings** → **Developer settings** → **Personal access tokens** → **Tokens (classic)**
-2. Click **Generate new token** → **Generate new token (classic)**
-3. Name it `GitHost`, set expiration (30 days recommended)
-4. Check **`repo`** scope
-5. Click **Generate token** and **copy it immediately** (starts with `ghp_`)
+1. Log in to GitHub and go to **Settings** → **Developer settings** → **Personal access tokens** → **Tokens (classic)**.
+2. Click **Generate new token** → **Generate new token (classic)**.
+3. Give it a name (e.g., `GitHost`).
+4. Set expiration (recommended: 30 days).
+5. Under **Select scopes**, check **`repo`** (this grants full control of private repositories).
+6. Click **Generate token**.
+7. **Copy the token immediately** (it starts with `ghp_`). You won't see it again.
 
-> 🔒 Treat this token like a password. Never commit it or share it publicly.
+> 🔒 **Security Note**: Treat this token like a password. Never commit it or share it publicly.
+
+---
 
 ### 2. Get Your ngrok Token
 
-1. Sign up at [ngrok.com](https://ngrok.com)
-2. Go to [Dashboard](https://dashboard.ngrok.com) → copy your **Authtoken**
-3. Paste into `NGROK_AUTH_TOKEN` in Colab
+1. Go to [ngrok.com](https://ngrok.com) and sign up for a free account.
+2. After login, go to the [Dashboard](https://dashboard.ngrok.com).
+3. Under **Getting Started** → **Your Authtoken**, copy the token.
+4. Paste it into the `NGROK_AUTH_TOKEN` field in the Colab notebook.
 
-> ℹ️ Free tier: 1 tunnel, 40 connections/min, random subdomains.
+> ℹ️ **Free Tier Limits**: ngrok free tier allows 1 online tunnel at a time, 40 connections/minute, and random subdomains. This is sufficient for personal use.
 
-### 3–5. Optional Integrations
+---
 
-<details>
-<summary>📧 Email Notifications</summary>
+### 3. Optional: Email Notifications
 
-1. Enable 2FA on Google account
-2. Generate an [App Password](https://myaccount.google.com/apppasswords) for Mail
-3. Set `SEND_EMAIL = True` and fill in email fields
-</details>
+To receive email alerts when uploads complete and when links are accessed:
 
-<details>
-<summary>🤖 Telegram Bot</summary>
+1. Enable 2-Factor Authentication on your Google account.
+2. Go to [Google App Passwords](https://myaccount.google.com/apppasswords).
+3. Select **Mail** as the app and **Other** as the device (name it `GitHost`).
+4. Copy the generated 16-character password.
+5. In the Colab form:
+   - `SEND_EMAIL = True`
+   - `EMAIL_FROM` = Your Gmail address
+   - `EMAIL_TO` = Recipient email (can be same)
+   - `EMAIL_PASSWORD` = The 16-character app password
+   - `SMTP_SERVER = smtp.gmail.com`
+   - `SMTP_PORT = 465`
 
-1. Create bot via [@BotFather](https://t.me/botfather)
-2. Get your Chat ID from [@userinfobot](https://t.me/userinfobot)
-3. Fill in `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID`
-</details>
+---
 
-<details>
-<summary>🔗 Bit.ly Shortening</summary>
+### 4. Optional: Telegram Bot
 
-1. Sign up at [bitly.com](https://bitly.com)
-2. Generate Access Token in [API Settings](https://app.bitly.com/settings/api/)
-3. Fill in `BITLY_ACCESS_TOKEN`
-</details>
+To receive upload notifications directly in Telegram:
+
+1. Open Telegram and search for [@BotFather](https://t.me/botfather).
+2. Send `/newbot` and follow the prompts to create a bot.
+3. Copy the **bot token** provided.
+4. Search for your bot by username and send `/start`.
+5. Go to [@userinfobot](https://t.me/userinfobot) and send any message to get your **Chat ID**.
+6. In the Colab form:
+   - `TELEGRAM_BOT_TOKEN` = Your bot token
+   - `TELEGRAM_CHAT_ID` = Your chat ID
+
+---
+
+### 5. Optional: Bit.ly URL Shortening
+
+To get shorter, cleaner URLs:
+
+1. Go to [Bit.ly](https://bitly.com) and sign up.
+2. Go to [API Settings](https://app.bitly.com/settings/api/).
+3. Enter your password and generate an **Access Token**.
+4. Copy the token and paste into `BITLY_ACCESS_TOKEN` in Colab.
 
 ---
 
@@ -223,37 +201,53 @@ GitHost/
 
 ### Uploading Files
 
-1. Run the notebook in Google Colab
-2. Choose upload method: `file` (device storage) or `url` (direct link)
-3. Configure the batch:
+1. **Run the notebook** in Google Colab.
+2. When prompted, choose upload method:
+   - `file` — Select files from your phone/computer storage
+   - `url` — Paste a direct URL to an image/video/document
+3. **Configure the batch**:
    ```
    Expiry in days (default 7): 3
    Max views (0=unlimited, default 0): 5
-   Password (optional): mysecret
+   Password (optional, press Enter to skip): mysecret
    ```
+4. Wait for the upload and processing to complete.
 
-### After Upload
+### Sharing Links
+
+After upload, you'll see:
 
 ```
 ==================================================
-✅ GitHost Pro v2.0 is LIVE!
+✅ GitHost is LIVE!
 🔗 Base URL: https://abc123.ngrok.io
 
 📸 Shareable Links:
   sunset.jpg: https://bit.ly/3xYzAbC?pwd=mysecret
+  [QR Code displayed]
 
-🖼️ Gallery:  https://abc123.ngrok.io/gallery
-🔐 Admin:    https://abc123.ngrok.io/admin
-📦 Download: https://abc123.ngrok.io/download_all
-📊 Stats:    https://abc123.ngrok.io/api/stats
+🖼️ Gallery: https://abc123.ngrok.io/gallery
+🔐 Admin: https://abc123.ngrok.io/admin (password: admin123)
+📦 Download all: https://abc123.ngrok.io/download_all
 ```
 
-### Admin Panel
+- **Direct Link**: Share `https://bit.ly/3xYzAbC?pwd=mysecret` with recipients.
+- **QR Code**: Scan with a phone camera to open directly.
 
-Visit `/admin` → enter password → view all links with:
-- Link ID, filename, views, status, created date
-- Delete buttons with confirmation
-- Manual cleanup of expired links
+### Managing Links
+
+Visit `/admin` in your browser:
+1. Enter the admin password (default: `admin123`).
+2. View a table of all active links with:
+   - Link ID
+   - Original filename
+   - Views used / Max views
+   - Expiry date
+3. Click **Delete** to manually revoke any link.
+
+### Viewing the Gallery
+
+Visit `/gallery` to see a grid of all currently active media with thumbnails.
 
 ---
 
@@ -261,20 +255,22 @@ Visit `/admin` → enter password → view all links with:
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `GITHUB_USERNAME` | string | — | Your GitHub username |
-| `GITHUB_TOKEN` | string | — | GitHub PAT with `repo` scope |
-| `REPO_NAME` | string | `my-image-hosting` | Repository name |
-| `NGROK_AUTH_TOKEN` | string | — | ngrok auth token |
-| `DEFAULT_EXPIRY_DAYS` | int | `7` | Default link expiry |
-| `DEFAULT_MAX_VIEWS` | int | `0` | Default max views (0=∞) |
-| `ADMIN_PASSWORD` | string | `admin123` | Admin panel password |
-| `SEND_EMAIL` | bool | `false` | Enable email notifications |
-| `EMAIL_TO` / `EMAIL_FROM` | string | — | Email addresses |
-| `EMAIL_PASSWORD` | string | — | Gmail app password |
-| `TELEGRAM_BOT_TOKEN` | string | — | Telegram bot token |
-| `TELEGRAM_CHAT_ID` | string | — | Telegram chat ID |
-| `BITLY_ACCESS_TOKEN` | string | — | Bit.ly API token |
-| `NGROK_SUBDOMAIN` | string | — | Custom subdomain (paid) |
+| `GITHUB_USERNAME` | string | - | Your GitHub username |
+| `GITHUB_TOKEN` | string | - | GitHub PAT (classic) with `repo` scope |
+| `REPO_NAME` | string | `my-image-hosting` | Repository name (auto-created if missing) |
+| `NGROK_AUTH_TOKEN` | string | - | ngrok authentication token |
+| `DEFAULT_EXPIRY_DAYS` | integer | `7` | Default days until link expires |
+| `DEFAULT_MAX_VIEWS` | integer | `0` | Default max views (0 = unlimited) |
+| `SEND_EMAIL` | boolean | `False` | Enable email notifications |
+| `EMAIL_TO` | string | - | Recipient email address |
+| `EMAIL_FROM` | string | - | Sender email (Gmail) |
+| `EMAIL_PASSWORD` | string | - | Gmail app password |
+| `SMTP_SERVER` | string | `smtp.gmail.com` | SMTP server |
+| `SMTP_PORT` | integer | `465` | SMTP port |
+| `TELEGRAM_BOT_TOKEN` | string | - | Telegram bot token |
+| `TELEGRAM_CHAT_ID` | string | - | Telegram chat ID |
+| `BITLY_ACCESS_TOKEN` | string | - | Bit.ly API access token |
+| `NGROK_SUBDOMAIN` | string | - | Custom subdomain (paid ngrok) |
 
 ---
 
@@ -282,77 +278,61 @@ Visit `/admin` → enter password → view all links with:
 
 | Endpoint | Description | Access |
 |----------|-------------|--------|
-| `/` | Home page with stats | Public |
-| `/i/<link_id>` | Serve media file | Public (optional password) |
-| `/info/<link_id>` | Link detail page | Public |
-| `/gallery` | Grid view of active media | Public |
-| `/admin` | Admin dashboard | Password protected |
-| `/download_all` | Download all as ZIP | Public |
-| `/static/<path>` | Static files (thumbnails) | Public |
+| `/` | Home page | Public |
+| `/i/<link_id>` | Serve a specific media file | Public (with optional password) |
+| `/gallery` | Grid view of all active media | Public |
+| `/admin` | Admin dashboard | Password protected (`admin123`) |
+| `/download_all` | Download all media as ZIP | Public |
+| `/static/<path>` | Serve static files (thumbnails) | Public |
 
 ---
 
-## 📡 API Reference
-
-All API endpoints return JSON.
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/stats` | GET | Storage stats (links, views, size) |
-| `/api/links` | GET | List all active links |
-| `/api/search?q=<query>` | GET | Search links by filename |
-| `/api/link/<link_id>` | GET | Detailed link stats |
-| `/api/popular?limit=10` | GET | Most viewed links |
-| `/api/expiring?hours=24` | GET | Links expiring soon |
-
-### Example: `/api/stats`
-```json
-{
-  "total_links": 15,
-  "active_links": 12,
-  "total_views": 847,
-  "total_size_bytes": 52428800,
-  "total_size_mb": 50.0
-}
-```
-
----
-
-## 🔬 Architecture
+## 🔬 Architecture & How It Works
 
 ```
 ┌─────────────────┐     ┌─────────────────────┐     ┌──────────────────────┐
 │  Your Phone/PC  │────▶│  Google Colab       │────▶│  Private GitHub Repo │
-│  Upload Files   │     │  (Flask + githost/)  │     │  (Storage)           │
+│  Upload Files   │     │  (Flask Server)     │     │  (Storage)           │
 └─────────────────┘     └─────────────────────┘     └──────────────────────┘
                                       │
                                       │ ngrok Tunnel
                                       ▼
                         ┌─────────────────────────┐
                         │  Public Internet        │
-                        │  https://xxx.ngrok.io   │
+                        │  https://xxx.ngrok.io  │
+                        └─────────────────────────┘
+                                      │
+                                      ▼
+                        ┌─────────────────────────┐
+                        │  End Users              │
+                        │  (View/Download Media)  │
                         └─────────────────────────┘
 ```
 
-**Flow:** Upload → Colab → GitHub Repo → Flask Server → ngrok → Public URL
+**Step-by-Step Flow:**
+
+1. **Upload**: Files are uploaded from your device to the Colab environment.
+2. **Storage**: Files are committed and pushed to the `media/` folder of your private GitHub repository.
+3. **Database**: A `links.json` file tracks each link's metadata (expiry, views, password hash).
+4. **Web Server**: A Flask server runs inside Colab, serving files from the cloned repository.
+5. **Public Access**: ngrok creates a secure tunnel to `localhost:5000`, providing a public HTTPS URL.
+6. **Link Management**: When a user visits `/i/<link_id>`, the server validates expiry, view count, and password before serving the file.
 
 ---
 
-## 🔒 Security
+## 🔒 Security Considerations
 
-| Layer | Implementation |
-|-------|----------------|
-| Storage | Private GitHub repo, token-authenticated API |
-| Transport | HTTPS via ngrok tunnel |
-| Links | UUID-based IDs (unguessable) |
-| Passwords | SHA-256 hashed, never stored in plain text |
-| Admin | Session-based auth with CSRF tokens |
-| Rate Limiting | 60 req/min (media), 10 req/min (admin) |
-| Headers | CSP, X-Frame-Options, X-Content-Type-Options |
-| SSRF Protection | URL validation blocks private/internal IPs |
-| Path Traversal | Real-path checks on static file serving |
+| Aspect | Implementation |
+|--------|----------------|
+| **Storage** | Files are stored in YOUR private GitHub repository. Only you have access via the GitHub API. |
+| **Transmission** | All traffic is encrypted via ngrok's HTTPS tunnel. |
+| **Authentication** | GitHub API uses token-based authentication. Admin panel uses a simple password (change `ADMIN_PASSWORD` in code). |
+| **Link Security** | Link IDs are UUIDs (unguessable). Optional password adds another layer. |
+| **Expiry** | Links automatically expire after the configured duration. |
+| **View Limits** | Links can be limited to a specific number of views. |
+| **Data Residency** | All data remains in your GitHub account (US/EU based on GitHub's infrastructure). |
 
-> ⚠️ Change `ADMIN_PASSWORD` from `admin123` before production use.
+> ⚠️ **Important**: The admin password is hardcoded as `admin123` in the notebook. For production use, **change this** in the code before running.
 
 ---
 
@@ -360,61 +340,105 @@ All API endpoints return JSON.
 
 | Issue | Solution |
 |-------|----------|
-| Repository not found | Auto-created. Ensure token has `repo` scope. |
-| ngrok failed | Check auth token. Free tier = 1 simultaneous tunnel. |
-| Email not sending | Use App Password, not regular password. Enable 2FA. |
-| Telegram not working | Verify token & chat ID. Send `/start` to bot first. |
-| Bit.ly not working | Check token. Free tier = 50 shortens/month. |
-| Thumbnails missing | Only JPG/PNG/GIF generate thumbnails. |
-| Server stops | Colab disconnects after ~90 min inactivity. |
-| Upload fails | GitHub API limit: 100MB per file. |
-| Timezone mismatch | Colab uses UTC. Check server time. |
+| `Repository not found` | The repo will be auto-created. Ensure your token has `repo` scope. |
+| `ngrok connection failed` | Check your ngrok auth token. Free tier allows only 1 simultaneous tunnel. |
+| `Email not sending` | Ensure you used an **App Password**, not your regular Gmail password. Enable 2FA first. |
+| `Telegram notifications not working` | Verify bot token and chat ID. Send `/start` to your bot first. |
+| `Bit.ly shortening not working` | Check your access token. Bit.ly free tier allows 50 shortens/month. |
+| `Gallery thumbnails not showing` | Only images (JPG, PNG, GIF) generate thumbnails. Videos won't show preview. |
+| `Server stops after a few hours` | Colab runtimes disconnect after ~90 minutes of inactivity. For longer sessions, interact with the notebook periodically. |
+| `Large file upload fails` | GitHub has a 100MB file size limit via API. Use Git LFS or split large files. |
+| `"Link expired" but I set expiry far in future` | Check server time vs. your local time. Colab uses UTC. |
 
 ---
 
 ## ❓ FAQ
 
-**Is it really free?** Yes — GitHub free repos, Colab free tier, ngrok free tier.
+### Q: Is this really free?
+**A:** Yes! GitHub (free private repos), Google Colab (free tier), ngrok (free tier), and the optional services all offer free tiers sufficient for personal use.
 
-**How long can it run?** Colab disconnects after ~90 min of inactivity. Interact periodically.
+### Q: How long can I keep the server running?
+**A:** Colab disconnects after ~90 minutes of inactivity. For longer sessions, click something in the notebook periodically. There's no way to keep it permanently online on the free tier.
 
-**Custom domain?** Yes — paid ngrok plans, or deploy Flask to Render/Railway.
+### Q: Can I use a custom domain instead of ngrok?
+**A:** Yes! Paid ngrok plans allow custom domains. Alternatively, you can deploy the Flask app to a free service like Render or Railway.
 
-**What happens when server stops?** Files stay in your GitHub repo. Start a new session anytime.
+### Q: What happens to my files when the server stops?
+**A:** Your files remain safely stored in your private GitHub repository. You can access them directly there or start a new GitHost session.
 
-**Can I upload folders?** Yes — ZIP them first.
+### Q: Can I upload folders?
+**A:** Yes! Create a ZIP file of your folder and upload it. The ZIP will be stored as-is.
 
-**Multiple uploaders?** Yes, if they have the GitHub token.
+### Q: How do I change the admin password?
+**A:** In the notebook code, find the line `ADMIN_PASSWORD = "admin123"` and change it to your desired password.
 
-**Supported file types?** `.jpg` `.jpeg` `.png` `.gif` `.webp` `.bmp` `.svg` `.mp4` `.mov` `.avi` `.mkv` `.webm` `.mp3` `.wav` `.ogg` `.flac` `.pdf` `.zip` `.rar` `.7z` `.txt` `.md` `.docx` `.xlsx` `.pptx`
+### Q: Can multiple people upload to the same repo?
+**A:** Yes, if they have the GitHub token. Be careful sharing your token — it grants full repo access.
+
+### Q: What file types are supported?
+**A:** By default: `.jpg`, `.jpeg`, `.png`, `.gif`, `.mp4`, `.mov`, `.pdf`, `.zip`, `.txt`, `.docx`. You can edit the `ALLOWED_EXTENSIONS` set in the code.
 
 ---
 
-## 📄 License
+## 📄 License & Disclaimer
 
-This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file.
+This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
 
 > [!WARNING]
-> GitHost is for personal, legitimate use only. Don't share copyrighted, illegal, or harmful content. Respect GitHub's ToS.
+> **Disclaimer**: GitHost is intended for personal, legitimate use only. Do not use it to share copyrighted, illegal, or harmful content. The author is not responsible for any misuse of this tool. Respect GitHub's Terms of Service and rate limits.
 
 ---
 
-## 🙏 Credits
+## 🙏 Credits & Acknowledgments
 
-[Google Colab](https://colab.research.google.com/) · [GitHub](https://github.com) · [ngrok](https://ngrok.com) · [Flask](https://flask.palletsprojects.com/) · [Pillow](https://python-pillow.org/) · [qrcode](https://pypi.org/project/qrcode/) · [python-telegram-bot](https://python-telegram-bot.readthedocs.io/)
+- **Google Colab** — Free cloud Python environment
+- **GitHub** — Storage and API
+- **ngrok** — Secure tunneling
+- **Flask** — Web framework
+- **Pillow** — Image processing
+- **qrcode** — QR code generation
+- **python-telegram-bot** — Telegram integration
 
 ---
+
+### 🔗 Quick Links
+
+| Service | Link |
+|---------|------|
+| Google Colab | [colab.research.google.com](https://colab.research.google.com/) |
+| GitHub Tokens | [github.com/settings/tokens](https://github.com/settings/tokens) |
+| ngrok Dashboard | [dashboard.ngrok.com](https://dashboard.ngrok.com/) |
+| Google App Passwords | [myaccount.google.com/apppasswords](https://myaccount.google.com/apppasswords) |
+| Telegram BotFather | [t.me/botfather](https://t.me/botfather) |
+| Bit.ly API | [app.bitly.com/settings/api](https://app.bitly.com/settings/api/) |
+
+---
+
+## 💕 Loved My Work?
+
+🚨 [Follow me on GitHub](https://github.com/Shineii86)
+
+⭐ [Give a star to this project](https://github.com/Shineii86/GitHost)
+
+🐛 [Report an issue](https://github.com/Shineii86/GitHost/issues)
+
+🔧 [Contribute](https://github.com/Shineii86/GitHost/fork)
 
 <div align="center">
 
-**Copyright [Shinei Nouzen](https://github.com/Shineii86) All Rights Reserved.**
+<a href="https://github.com/Shineii86/GitHost">
+<img src="https://github.com/Shineii86/AniPay/blob/main/Source/Banner6.png" alt="Banner">
+</a>
+  
+  *For inquiries or collaborations*
+     
+[![Telegram Badge](https://img.shields.io/badge/-Telegram-2CA5E0?style=flat&logo=Telegram&logoColor=white)](https://telegram.me/Shineii86 "Contact on Telegram")
+[![Instagram Badge](https://img.shields.io/badge/-Instagram-C13584?style=flat&logo=Instagram&logoColor=white)](https://instagram.com/ikx7.a "Follow on Instagram")
+[![Pinterest Badge](https://img.shields.io/badge/-Pinterest-E60023?style=flat&logo=Pinterest&logoColor=white)](https://pinterest.com/ikx7a "Follow on Pinterest")
+[![Gmail Badge](https://img.shields.io/badge/-Gmail-D14836?style=flat&logo=Gmail&logoColor=white)](mailto:ikx7a@hotmail.com "Send an Email")
 
-*Made with ❤️ for ultimate self-hosted sharing*
+  <sup><b>Copyright © 2026 <a href="https://telegram.me/Shineii86">Shinei Nouzen</a> All Rights Reserved</b></sup>
 
-[![Telegram](https://img.shields.io/badge/-Telegram-2CA5E0?style=flat&logo=Telegram&logoColor=white)](https://telegram.me/Shineii86)
-[![Instagram](https://img.shields.io/badge/-Instagram-C13584?style=flat&logo=Instagram&logoColor=white)](https://instagram.com/ikx7.a)
-[![Gmail](https://img.shields.io/badge/-Gmail-D14836?style=flat&logo=Gmail&logoColor=white)](mailto:ikx7a@hotmail.com)
-
-⭐ [Star this repo](https://github.com/Shineii86/GitHost) · 🐛 [Report issue](https://github.com/Shineii86/GitHost/issues) · 🔧 [Contribute](https://github.com/Shineii86/GitHost/fork)
+![Last Commit](https://img.shields.io/github/last-commit/Shineii86/GitHost?style=for-the-badge)
 
 </div>

@@ -372,7 +372,7 @@ def render_gallery(active_links: list, base_url: str) -> str:
                 <img src="{thumb_url}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 200 160%22><rect fill=%22%2321262d%22 width=%22200%22 height=%22160%22/><text x=%2250%%22 y=%2250%%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%238b949e%22 font-size=%2240%22>📄</text></svg>'" alt="{name}">
                 <div class="info">
                     <div class="name">{name}</div>
-                    <div class="meta">{views_text} · {exp_text}</div>
+                    <div class="meta">{views_text} · {exp_text} · <a href="/info/{link_id}" style="color:var(--accent);">Details</a></div>
                 </div>
             </a>"""
 
@@ -410,7 +410,7 @@ def render_gallery(active_links: list, base_url: str) -> str:
 </html>"""
 
 
-def render_admin(links_db: dict, authenticated: bool = False, error: str = "", csrf_token: str = "") -> str:
+def render_admin(links_db: dict, authenticated: bool = False, error: str = "") -> str:
     if not authenticated:
         error_html = f'<p style="color:var(--danger); margin-bottom:12px;">{error}</p>' if error else ""
         return f"""<!DOCTYPE html>
@@ -483,7 +483,6 @@ def render_admin(links_db: dict, authenticated: bool = False, error: str = "", c
             <td>{created}</td>
             <td>
                 <form method="post" style="display:inline;">
-                    <input type="hidden" name="csrf_token" value="{csrf_token}">
                     <input type="hidden" name="link_id" value="{link_id}">
                     <input type="hidden" name="action" value="delete">
                     <button type="submit" class="btn btn-danger" onclick="return confirm('Delete this link?')">Delete</button>
@@ -532,7 +531,6 @@ def render_admin(links_db: dict, authenticated: bool = False, error: str = "", c
             </table>
         </div>
         <form method="post" style="margin-top:16px;">
-            <input type="hidden" name="csrf_token" value="{csrf_token}">
             <input type="hidden" name="action" value="cleanup">
             <button type="submit" class="btn btn-success">🧹 Cleanup Expired</button>
         </form>
@@ -568,6 +566,90 @@ def render_password_gate(link_id: str, error: str = "") -> str:
                 <button type="submit" class="btn" style="width:100%; margin-top:8px;">Access File</button>
             </form>
         </div>
+    </div>
+</body>
+</html>"""
+
+
+def render_link_detail(link_id: str, info: dict, stats: dict, base_url: str) -> str:
+    """Render a link detail/info page."""
+    name = info.get("original_name", link_id)
+    views = stats["views"]
+    max_views = stats["max_views"]
+    views_text = f"{views}/{max_views}" if max_views > 0 else f"{views} / ∞"
+
+    status_class = "badge-active" if stats["is_active"] else ("badge-expired" if stats["is_expired"] else "badge-limited")
+    status_text = "Active" if stats["is_active"] else ("Expired" if stats["is_expired"] else "Limit Reached")
+
+    remaining = ""
+    if stats["is_active"]:
+        if stats["days_remaining"] > 0:
+            remaining = f"{stats['days_remaining']} days remaining"
+        else:
+            remaining = f"{stats['hours_remaining']} hours remaining"
+
+    password_badge = ' <span class="badge" style="background:rgba(88,166,255,0.15); color:var(--accent);">🔒 Protected</span>' if stats["has_password"] else ""
+
+    ext = name.rsplit(".", 1)[-1].lower() if "." in name else ""
+    icon_map = {
+        "jpg": "🖼️", "jpeg": "🖼️", "png": "🖼️", "gif": "🖼️", "webp": "🖼️", "bmp": "🖼️", "svg": "🖼️",
+        "mp4": "🎬", "mov": "🎬", "avi": "🎬", "mkv": "🎬", "webm": "🎬",
+        "mp3": "🎵", "wav": "🎵", "ogg": "🎵", "flac": "🎵",
+        "pdf": "📄", "zip": "📦", "rar": "📦", "7z": "📦",
+        "txt": "📝", "md": "📝", "docx": "📝", "xlsx": "📊", "pptx": "📊",
+    }
+    icon = icon_map.get(ext, "📁")
+
+    return f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{name} - GitHost Pro</title>
+    <style>{BASE_CSS}</style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>📸 <span>GitHost</span> Pro</h1>
+            <nav>
+                <a href="/">Home</a>
+                <a href="/gallery">Gallery</a>
+                <a href="/admin">Admin</a>
+            </nav>
+        </div>
+    </header>
+    <div class="container" style="max-width:600px; margin-top:30px;">
+        <div class="card">
+            <div style="font-size:3em; text-align:center; margin-bottom:16px;">{icon}</div>
+            <h2 style="text-align:center; margin-bottom:8px;">{name}</h2>
+            <div style="text-align:center; margin-bottom:20px;">
+                <span class="badge {status_class}">{status_text}</span>
+                {password_badge}
+            </div>
+            <div class="stats-grid" style="margin:20px 0;">
+                <div class="stat-card">
+                    <div class="value">{views}</div>
+                    <div class="label">Views</div>
+                </div>
+                <div class="stat-card">
+                    <div class="value">{max_views if max_views > 0 else '∞'}</div>
+                    <div class="label">Max Views</div>
+                </div>
+                <div class="stat-card">
+                    <div class="value">{stats['days_remaining']}</div>
+                    <div class="label">Days Left</div>
+                </div>
+            </div>
+            {f'<p style="text-align:center; color:var(--text-muted); margin:12px 0;">{remaining}</p>' if remaining else ''}
+            <div style="text-align:center; margin-top:20px;">
+                <a href="/i/{link_id}" class="btn btn-success" style="margin:4px;">📥 Access File</a>
+                <a href="/gallery" class="btn" style="margin:4px;">🖼️ Gallery</a>
+            </div>
+        </div>
+    </div>
+    <div class="footer">
+        <p>📸 <a href="https://github.com/Shineii86/GitHost">GitHost Pro</a> by Shinei Nouzen</p>
     </div>
 </body>
 </html>"""
