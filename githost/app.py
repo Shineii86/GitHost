@@ -16,10 +16,14 @@ from flask import (
 from flask_cors import CORS
 
 from .templates import (
-    render_home, render_gallery, render_admin,
+    render_home, render_gallery, render_admin, render_link_detail,
     render_password_gate, render_error,
 )
 from .cleanup import cleanup_expired, get_storage_stats
+from .link_manager import (
+    search_links, get_link_stats, batch_delete, batch_extend_expiry,
+    get_popular_links, get_expiring_soon,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -105,6 +109,15 @@ def create_app(storage, config, notifier_email=None, notifier_telegram=None, sho
     def gallery():
         active = storage.get_active_links()
         return render_gallery(active, "/")
+
+    @app.route("/info/<link_id>")
+    def link_info(link_id):
+        """Link detail page with stats."""
+        if link_id not in storage.links_db:
+            return render_error(404, "Link not found."), 404
+        info = storage.links_db[link_id]
+        stats = get_link_stats(info)
+        return render_link_detail(link_id, info, stats, "/")
 
     @app.route("/admin", methods=["GET", "POST"])
     def admin():
@@ -201,6 +214,57 @@ def create_app(storage, config, notifier_email=None, notifier_telegram=None, sho
                 "has_password": "password_hash" in info,
             })
         return jsonify(result)
+
+    @app.route("/api/search")
+    def api_search():
+        """Search links by filename."""
+        query = request.args.get("q", "")
+        if not query:
+            return jsonify({"error": "Query parameter 'q' is required"}), 400
+        results = search_links(storage.links_db, query)
+        return jsonify([{
+            "id": lid,
+            "name": info.get("original_name", ""),
+            "views": info.get("views", 0),
+            "max_views": info.get("max_views", 0),
+            "expiry": info.get("expiry", ""),
+        } for lid, info in results])
+
+    @app.route("/api/link/<link_id>")
+    def api_link_detail(link_id):
+        """Get detailed stats for a specific link."""
+        if link_id not in storage.links_db:
+            return jsonify({"error": "Link not found"}), 404
+        info = storage.links_db[link_id]
+        stats = get_link_stats(info)
+        return jsonify({
+            "id": link_id,
+            "name": info.get("original_name", ""),
+            "filename": info.get("filename", ""),
+            **stats,
+        })
+
+    @app.route("/api/popular")
+    def api_popular():
+        """Get most viewed links."""
+        limit = request.args.get("limit", 10, type=int)
+        popular = get_popular_links(storage.links_db, limit)
+        return jsonify([{
+            "id": lid,
+            "name": info.get("original_name", ""),
+            "views": info.get("views", 0),
+        } for lid, info in popular])
+
+    @app.route("/api/expiring")
+    def api_expiring():
+        """Get links expiring soon."""
+        hours = request.args.get("hours", 24, type=int)
+        expiring = get_expiring_soon(storage.links_db, hours)
+        return jsonify([{
+            "id": lid,
+            "name": info.get("original_name", ""),
+            "expiry": info.get("expiry", ""),
+        } for lid, info in expiring])
 
     # --- Error handlers ---
 
